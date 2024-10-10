@@ -20,6 +20,7 @@ export const handleGithubAuth = async (code) => {
       clientSecret,
       code
     );
+
     const userData = await getUserData(accessToken);
     const userId = userData.id;
 
@@ -32,7 +33,7 @@ export const handleGithubAuth = async (code) => {
     };
   } catch (error) {
     console.error("GitHub authentication error:", error.message);
-    throw new Error(AUTH_CONSTANTS.ERROR_MESSAGES.GITHUB_AUTH_FAILED);
+    throw new Error(error.message || AUTH_CONSTANTS.ERROR_MESSAGES.GITHUB_AUTH_FAILED);
   }
 };
 

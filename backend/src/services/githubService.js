@@ -10,7 +10,13 @@ export const exchangeCodeForToken = async (clientId, clientSecret, code) => {
     { client_id: clientId, client_secret: clientSecret, code },
     { headers: { Accept: "application/json" } }
   );
-  return response.data.access_token;
+  const result = response.data;
+
+  if (result?.error) {
+    throw new Error(result?.error_description);
+  }
+
+  return result.access_token;
 };
 
 export const getUserData = async (accessToken) => {

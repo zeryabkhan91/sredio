@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/enviroments/enviroment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GithubService {
-  private clientId = 'dbc703768e38fbd9aed8';
-  private redirectUri = 'http://localhost:4200/auth';
+  private apiUrl: string = (environment as any).apiUrl;
+  private clientId: string = (environment as any).githubClientID;
+  private redirectUri = `${window.location.origin}/auth`;
 
   constructor(private http: HttpClient) {}
 
@@ -17,16 +19,16 @@ export class GithubService {
   }
 
   getAccessToken(code: string): Observable<any> {
-    return this.http.post('http://localhost:3001/api/auth/github', { code });
+    return this.http.post(`${this.apiUrl}/auth/github`, { code });
   }
 
   getUserDetails(): Observable<any> {
-    return this.http.get('http://localhost:3001/api/user/details');
+    return this.http.get(`${this.apiUrl}/user/details`);
   }
 
   disconnectFromGithub(): Observable<any> {
     return this.http.post(
-      'http://localhost:3001/api/auth/github/disconnect',
+      `${this.apiUrl}/auth/github/disconnect`,
       {}
     );
   }
