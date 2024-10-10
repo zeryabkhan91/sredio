@@ -1,0 +1,127 @@
+.accordion-container {
+  .mat-expansion-panel {
+    margin: 40px;
+    min-width: 800px;
+    background-color: rgb(252, 252, 252);
+    color: black !important;
+    border: none;
+
+    ::ng-deep {
+      .mat-expansion-indicator::after {
+        color: black;
+      }
+    }
+
+    .panel-header {
+      color: black !important;
+
+      .header-icon {
+        margin-left: 10px;
+      }
+
+      .title {
+        color: black;
+        font-weight: bold;
+        font-size: 18px;
+
+        svg.github-icon {
+          margin: 5px;
+          fill: currentColor;
+          width: 24px;
+          height: 24px;
+        }
+
+        .tick {
+          background-color: green;
+          color: white;
+          margin-left: 10px;
+          border-radius: 50%;
+          width: 25px;
+          height: 25px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+      }
+
+      .connection-info {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        color: rgb(0, 0, 0);
+
+        .connection-date {
+          margin-right: 30px;
+          color: grey;
+        }
+      }
+    }
+    
+    .expansion-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .connect-button {
+        background-color: rgba(0, 52, 174, 0.7);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .connect-description {
+        color: rgba(0, 52, 174, 0.7);
+        font-weight: bold;
+        font-size: 25px;
+      }
+    }
+
+    .expansion-content-connected {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+
+      
+
+      .button-container {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: auto;
+
+        .remove-connection-button {
+          background-color: rgba(0, 52, 174, 0.7);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          & > span {
+            display: flex;
+          }
+        }
+      }
+    }
+  }
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+}
