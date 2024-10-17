@@ -26,10 +26,26 @@ export class GithubService {
     return this.http.get(`${this.apiUrl}/user/details`);
   }
 
-  disconnectFromGithub(): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/auth/github/disconnect`,
-      {}
+  getOrganizationRepos(page: number, limit: number): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/organizations/repos?page=${page}&limit=${limit}`
     );
+  }
+
+  getUsersList(page: number, limit: number): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/user/list?page=${page}&limit=${limit}`
+    );
+  }
+  includeUser(repoId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/user/include/${repoId}`);
+  }
+
+  excludeUser(repoId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/user/${repoId}`);
+  }
+
+  disconnectFromGithub(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/github/disconnect`, {});
   }
 }

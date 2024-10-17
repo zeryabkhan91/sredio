@@ -9,7 +9,7 @@ export const authenticateWithGithub = async (req, res) => {
     const result = await handleGithubAuth(code);
     return res.json(result);
   } catch (error) {
-    console.error('Error during GitHub authentication:', error);
+    console.error("Error during GitHub authentication:", error);
     res
       .status(500)
       .json({ error: AUTH_CONSTANTS.ERROR_MESSAGES.GITHUB_AUTH_FAILED });

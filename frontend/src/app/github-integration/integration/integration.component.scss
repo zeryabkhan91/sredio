@@ -1,3 +1,13 @@
+.example-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#myGrid {
+  flex: 1 1 0px;
+  width: 100%;
+}
 .accordion-container {
   .mat-expansion-panel {
     margin: 40px;
@@ -57,7 +67,7 @@
         }
       }
     }
-    
+
     .expansion-content {
       display: flex;
       flex-direction: column;
@@ -85,8 +95,6 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
-
-      
 
       .button-container {
         display: flex;

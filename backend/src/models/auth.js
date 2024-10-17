@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const integrationSchema = new mongoose.Schema({
   userId: { type: String, required: true },
@@ -6,5 +6,5 @@ const integrationSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
 });
 
-const Integration = mongoose.model('Integration', integrationSchema);
+const Integration = mongoose.model("Integration", integrationSchema);
 export default Integration;

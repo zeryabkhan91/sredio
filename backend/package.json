@@ -4,7 +4,7 @@
   "description": "A Node.js backend with Express",
   "main": "src/app.js",
   "type": "module",
-  "scripts": {
+  "scripts": {  
     "start": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
