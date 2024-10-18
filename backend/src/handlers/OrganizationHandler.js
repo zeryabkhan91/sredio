@@ -1,4 +1,4 @@
-import Organization from "../models/organization";
+import Organization from '../models/organization.js';
 
 export const findOrganizationByUserId = async (options) => {
   try {

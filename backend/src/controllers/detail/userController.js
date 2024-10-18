@@ -25,9 +25,10 @@ export const getUserDetails = async (req, res) => {
 export const getUserAdditionalDetails = async (req, res) => {
   const { accessToken } = req.tokenData;
   const { repoId } = req.params;
+  const { isIncluded } = req.body;
 
   try {
-    const data = await fetchGithubUserAdditionalDetails(repoId, accessToken);
+    const data = await fetchGithubUserAdditionalDetails(repoId, accessToken, isIncluded);
     res.json({ data });
   } catch (error) {
     console.log(error);

@@ -82,11 +82,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
   }
 
   onIncludeRepo(data: any, checked: any) {
-    if (checked) {
-      this.githubService.includeUser(data.ID).subscribe();
-    } else {
-      this.githubService.excludeUser(data.ID).subscribe();
-    }
+    this.githubService.includeUser(data.ID, checked).subscribe();
   }
 
   ngOnInit() {

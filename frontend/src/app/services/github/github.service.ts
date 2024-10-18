@@ -14,7 +14,7 @@ export class GithubService {
   constructor(private http: HttpClient) {}
 
   redirectToGithub() {
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.redirectUri}`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.redirectUri}&scope=user`;
     window.location.href = authUrl;
   }
 
@@ -37,8 +37,8 @@ export class GithubService {
       `${this.apiUrl}/user/list?page=${page}&limit=${limit}`
     );
   }
-  includeUser(repoId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/user/include/${repoId}`);
+  includeUser(repoId: number, isIncluded: boolean): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/include/${repoId}`, { isIncluded });
   }
 
   excludeUser(repoId: number): Observable<any> {

@@ -9,8 +9,8 @@ import {
   saveIntegration,
 } from "../../handlers/integrationHandler.js";
 import axios from "axios";
-import { findRepository, saveRepository } from "../../handlers/RepositoryHandler";
 import { findOrganizationByUserId, saveOrganizationDetails } from "../../handlers/OrganizationHandler.js";
+import { findRepository, saveRepository } from "../../handlers/RepositoryHandler.js";
 
 const GITHUB_BASE_URL = process.env.GITHUB_BASE_URL;
 
@@ -63,7 +63,7 @@ export const disconnectGithubIntegration = async (userId) => {
 export const fetchGithubOrganizationsAndRepositories = async (accessToken) => {
   try {
     const organizationsResponse = await axios.get(
-      `${GITHUB_BASE_URL}/organizations`,
+      `${GITHUB_BASE_URL}/user/orgs`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -78,7 +78,7 @@ export const fetchGithubOrganizationsAndRepositories = async (accessToken) => {
       let existingOrg = await findOrganizationByUserId({ id: org.id });
 
       if (!existingOrg) {
-        existingOrg = saveOrganizationDetails({
+        existingOrg = await saveOrganizationDetails({
           login: org.login,
           id: org.id,
           node_id: org.node_id,
@@ -93,11 +93,10 @@ export const fetchGithubOrganizationsAndRepositories = async (accessToken) => {
           description: org.description,
         });
 
-        await existingOrg.save();
       }
 
       const reposResponse = await axios.get(
-        `${GITHUB_BASE_URL}/orgs/${org.id}/repos`,
+        `${GITHUB_BASE_URL}/orgs/${org.login}/repos`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }

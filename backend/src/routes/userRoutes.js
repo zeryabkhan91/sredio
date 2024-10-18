@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.get("/details", authenticateUser, getUserDetails);
-router.get("/include/:repoId", authenticateUser, getUserAdditionalDetails);
+router.post("/include/:repoId", authenticateUser, getUserAdditionalDetails);
 router.delete("/:repoId", authenticateUser, deleteIncludedUser);
 router.get("/list", authenticateUser, getUsersList);
 

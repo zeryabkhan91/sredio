@@ -1,6 +1,5 @@
-import { handleGithubAuth } from "./authManager.js";
+import { handleGithubAuth, disconnectGithubIntegration } from "./authManager.js";
 import { AUTH_CONSTANTS } from "../../constants/authConstant.js";
-import { disconnectGithubIntegration } from "./authManager.js";
 
 export const authenticateWithGithub = async (req, res) => {
   const { code } = req.body;

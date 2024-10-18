@@ -1,9 +1,10 @@
-import User from "../models/user";
+import User from '../models/user.js'
 
 export const findUserAndUpdateByUserId = async (options) => {
   try {
-    return User.findOneAndUpdate(options);
+    const user = new User(options);
+    return user.save()
   } catch (error) {
     throw new Error("Error finding organization data");
   }
-};
+};  

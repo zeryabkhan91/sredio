@@ -7,7 +7,7 @@ import {
   fetchRepoPulls,
 } from "../../services/githubService.js";
 import User from "../../models/user.js";
-import { findRepository } from "../../handlers/RepositoryHandler.js";
+import { deleteRepository, findRepository, updateRepository } from "../../handlers/RepositoryHandler.js";
 import { findUserAndUpdateByUserId } from "../../handlers/UserHandler.js"
 
 const GITHUB_USER_URL = "https://api.github.com/user";
@@ -30,9 +30,15 @@ export const fetchGithubUserDetails = async (userId, accessToken) => {
   }
 };
 
-export const fetchGithubUserAdditionalDetails = async (repoId, accessToken) => {
+export const fetchGithubUserAdditionalDetails = async (repoId, accessToken, isIncluded) => {
   try {
-    let repo = await findRepository({ id: repoId });
+    let repo = await updateRepository(repoId, { included: true });
+
+    if (!isIncluded) {
+      await deleteRepository(repo.id)
+
+      return
+    }
 
     const totalCommits = await fetchRepoCommits(
       repo.name,
@@ -50,18 +56,13 @@ export const fetchGithubUserAdditionalDetails = async (repoId, accessToken) => {
       accessToken
     );
 
-    await findUserAndUpdateByUserId(
-      { id: repo.owner_id },
-      {
-        $set: {
-          name: repo.owner_name,
-          total_commits: totalCommits,
-          total_issues: totalIssues,
-          total_pulls: totalPulls,
-        },
-      },
-      { upsert: true, new: true }
-    );
+    await findUserAndUpdateByUserId({
+      id: repo.owner_id,
+      name: repo.owner_name,
+      total_commits: totalCommits,
+      total_issues: totalIssues,
+      total_pulls: totalPulls,
+    });
 
     const allUsers = await User.find();
 
