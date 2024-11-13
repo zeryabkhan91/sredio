@@ -30,10 +30,17 @@ export class IntegrationComponent implements OnInit, OnDestroy {
   colDefs: ColDef[] = [
     { field: 'ID' },
     { field: 'Name' },
-    { field: 'Link' },
+    {
+      field: 'Link',
+      cellRenderer: (params: any) => {
+        const url = params.value;
+        return `<a href="${url}" target="_blank">${url}</a>`;
+      },
+    },
     { field: 'Slug' },
     {
-      field: 'Included',
+      field: 'isIncluded',
+      headerName: 'Is Included',
       editable: true,
       cellRenderer: CheckboxComponent,
     },
@@ -115,7 +122,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
                   Name: repo.name,
                   Link: repo.url,
                   Slug: repo.full_name,
-                  Included: false,
+                  isIncluded: repo.isIncluded,
                 };
               });
 
@@ -182,6 +189,8 @@ export class IntegrationComponent implements OnInit, OnDestroy {
           this.connected = true;
         },
         (error) => {
+          localStorage.removeItem('token');
+          this.isLoading = false;
           console.error('Error fetching user details:', error);
         },
         () => {
@@ -216,6 +225,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
             this.router.navigate(['/']);
           },
           (error) => {
+            this.isLoading = false;
             console.error('Error getting access token:', error);
           }
         );

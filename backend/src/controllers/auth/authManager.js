@@ -1,16 +1,26 @@
 import {
   exchangeCodeForToken,
+  fetchOrganizationsRepos,
+  fetchUserRepos,
   getUserData,
 } from "../../services/githubService.js";
 import { generateToken } from "../../utilis/jwtUtils.js";
 import { AUTH_CONSTANTS } from "../../constants/authConstant.js";
 import {
   deleteIntegrationById,
+  findIntegrationByUserId,
   saveIntegration,
 } from "../../handlers/integrationHandler.js";
 import axios from "axios";
-import { findOrganizationByUserId, saveOrganizationDetails } from "../../handlers/OrganizationHandler.js";
-import { findRepository, saveRepository } from "../../handlers/RepositoryHandler.js";
+import {
+  deleteOrganization,
+  saveOrganizationDetails,
+} from "../../handlers/OrganizationHandler.js";
+import {
+  deleteRepositoryByIntegration,
+  saveRepository,
+} from "../../handlers/RepositoryHandler.js";
+import { deleteUsersByOptions } from "../../handlers/UserHandler.js";
 
 const GITHUB_BASE_URL = process.env.GITHUB_BASE_URL;
 
@@ -32,17 +42,21 @@ export const handleGithubAuth = async (code) => {
     const userData = await getUserData(accessToken);
     const userId = userData.id;
 
-    await saveIntegration({ userId, accessToken });
+    const integration = await saveIntegration({ userId, accessToken });
     const token = generateToken(userId, accessToken);
 
-    await fetchGithubOrganizationsAndRepositories(accessToken);
+    await fetchGithubOrganizationsAndRepositories(
+      userData.login,
+      accessToken,
+      integration._id?.toJSON()
+    );
 
     return {
       message: AUTH_CONSTANTS.SUCCESS_MESSAGES.INTEGRATION_SUCCESS,
       token,
     };
   } catch (error) {
-    console.error("GitHub authentication error:", error.message);
+    console.error("GitHub authentication error:", error);
     throw new Error(
       error.message || AUTH_CONSTANTS.ERROR_MESSAGES.GITHUB_AUTH_FAILED
     );
@@ -51,7 +65,12 @@ export const handleGithubAuth = async (code) => {
 
 export const disconnectGithubIntegration = async (userId) => {
   try {
+    const integration = await findIntegrationByUserId(userId);
+
     await deleteIntegrationById(userId);
+    await deleteUsersByOptions({ integrationId: integration?._id?.toJSON() });
+    await deleteRepositoryByIntegration(integration?._id?.toJSON());
+    await deleteOrganization(integration?._id?.toJSON());
 
     return { message: AUTH_CONSTANTS.SUCCESS_MESSAGES.DISCONNECT_SUCCESS };
   } catch (error) {
@@ -60,40 +79,28 @@ export const disconnectGithubIntegration = async (userId) => {
   }
 };
 
-export const fetchGithubOrganizationsAndRepositories = async (accessToken) => {
+export const fetchGithubOrganizationsAndRepositories = async (
+  username,
+  accessToken,
+  integrationId
+) => {
   try {
-    const organizationsResponse = await axios.get(
-      `${GITHUB_BASE_URL}/user/orgs`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
+    const userRepos = await fetchUserRepos({ username, accessToken });
+
+    await Promise.all(
+      userRepos.map(async (repo) => {
+        await saveRepository({ ...repo, integrationId });
+      })
     );
 
-    const organizations = organizationsResponse.data;
+    const organizations = await fetchOrganizationsRepos(accessToken);
 
     const orgReposPromises = organizations.map(async (org) => {
       if (!org.id) {
         return;
       }
-      let existingOrg = await findOrganizationByUserId({ id: org.id });
 
-      if (!existingOrg) {
-        existingOrg = await saveOrganizationDetails({
-          login: org.login,
-          id: org.id,
-          node_id: org.node_id,
-          url: org.url,
-          repos_url: org.repos_url,
-          events_url: org.events_url,
-          hooks_url: org.hooks_url,
-          issues_url: org.issues_url,
-          members_url: org.members_url,
-          public_members_url: org.public_members_url,
-          avatar_url: org.avatar_url,
-          description: org.description,
-        });
-
-      }
+      await saveOrganizationDetails({ ...org, integrationId });
 
       const reposResponse = await axios.get(
         `${GITHUB_BASE_URL}/orgs/${org.login}/repos`,
@@ -109,34 +116,7 @@ export const fetchGithubOrganizationsAndRepositories = async (accessToken) => {
           return;
         }
 
-        let existingRepo = await findRepository({ id: repo.id });
-
-        if (!existingRepo) {
-          await saveRepository({
-            id: repo.id,
-            name: repo.name,
-            full_name: repo.full_name,
-            html_url: repo.html_url,
-            description: repo.description,
-            private: repo.private,
-            fork: repo.fork,
-            url: repo.url,
-            created_at: repo.created_at,
-            updated_at: repo.updated_at,
-            pushed_at: repo.pushed_at,
-            size: repo.size,
-            stargazers_count: repo.stargazers_count,
-            watchers_count: repo.watchers_count,
-            language: repo.language,
-            forks_count: repo.forks_count,
-            open_issues_count: repo.open_issues_count,
-            watchers: repo.watchers,
-            default_branch: repo.default_branch,
-            organization_id: existingOrg.id,
-            owner_name: repo.owner.login,
-            owner_id: repo.owner.id,
-          })
-        }
+        await saveRepository({ ...repo, integrationId });
       });
 
       await Promise.all(repoPromises);

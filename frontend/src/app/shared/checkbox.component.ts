@@ -3,8 +3,7 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 
 @Component({
-  standalone: true,
-  template: `<input type="checkbox" (click)="onInputChange($event)" />`,
+  template: `<input type="checkbox" [checked]="params.value" (click)="onInputChange($event)" />`,
 })
 export class CheckboxComponent implements ICellRendererAngularComp {
   params: any;
@@ -14,11 +13,13 @@ export class CheckboxComponent implements ICellRendererAngularComp {
   }
 
   refresh(params: ICellRendererParams) {
+    this.params = params; 
     return true;
   }
 
   onInputChange(event: any) {
     const isChecked = event.target.checked;
+    this.params.node?.setDataValue('isIncluded', isChecked);
     this.params.context.onIncludeRepo(this.params.data, isChecked);
   }
 }

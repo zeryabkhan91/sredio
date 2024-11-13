@@ -12,6 +12,9 @@ const organizationSchema = new mongoose.Schema({
   members_url: String,
   public_members_url: String,
   avatar_url: String,
+  integrationId: {
+    type: mongoose.Schema.ObjectId
+  },
   description: String,
 });
 

@@ -15,7 +15,7 @@ export const getUserDetails = async (req, res) => {
       fetchGithubUserDetails(userId, accessToken),
     ]);
 
-    res.json({ user: { ...user, ...integration.toJSON() } });
+    res.json({ user: { ...user, ...integration?.toJSON() } });
   } catch (error) {
     console.log(error);
     res.status(401).json({ error: error.message }); // error code ?

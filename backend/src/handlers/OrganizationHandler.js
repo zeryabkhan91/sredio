@@ -8,6 +8,13 @@ export const findOrganizationByUserId = async (options) => {
   }
 };
 
+export const deleteOrganization = async (integrationId) => {
+  try {
+    return Organization.deleteMany({ integrationId });
+  } catch (error) {
+    throw new Error("Error finding organization data");
+  } 
+}
 
 export const saveOrganizationDetails = async (options) => {
   try {
@@ -15,6 +22,7 @@ export const saveOrganizationDetails = async (options) => {
 
     await organization.save();
   } catch (error) {
+    console.log("Error:: ", error)
     throw new Error("Error saving organization data");
   }
 };

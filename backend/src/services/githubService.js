@@ -1,5 +1,6 @@
 import axios from "axios";
 import { AUTH_CONSTANTS } from "../constants/authConstant.js";
+import { separateUserFromCommitsAndPulls } from "../utilis/github-utils.js";
 const GITHUB_BASE_URL = process.env.GITHUB_BASE_URL;
 const GITHUB_API_URL = "https://github.com/login/oauth/access_token";
 const GITHUB_USER_URL = "https://api.github.com/user";
@@ -43,6 +44,51 @@ export const fetchGithubUserDetails = async (userId, accessToken) => {
   }
 };
 
+export const fetchUserRepos = async ({ username, accessToken }) => {
+  try {
+    const userReposResponse = await axios.get(
+      `${GITHUB_BASE_URL}/users/${username}/repos`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    return userReposResponse.data || [];
+  } catch(error) {
+    console.log('error', error)
+    return [];
+  }
+}
+
+export const fetchOrganizations = async (accessToken) => {
+  try {
+    const organizationsResponse = await axios.get(
+      `${GITHUB_BASE_URL}/user/orgs`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    
+    return organizationsResponse.data || [];
+  } catch(error) {
+    return [];
+  }
+}
+
+export const fetchOrganizationsRepos = async (accessToken) => {
+  try {
+    const organizationsResponse = await axios.get(
+      `${GITHUB_BASE_URL}/user/orgs`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    
+    return organizationsResponse.data || [];
+  } catch(error) {
+    return [];
+  }
+}
+
 export const fetchRepoCommits = async (repo, owner, accessToken) => {
   try {
     const commitsResponse = await axios.get(
@@ -51,15 +97,8 @@ export const fetchRepoCommits = async (repo, owner, accessToken) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    if (
-      commitsResponse &&
-      commitsResponse.data &&
-      commitsResponse.data.length > 0
-    ) {
-      return commitsResponse.data.length;
-    } else {
-      return 0;
-    }
+
+    return separateUserFromCommitsAndPulls(commitsResponse.data);
   } catch (error) {
     console.error(`Error fetching commits for ${repo}:`, error.message);
     return 0;
@@ -74,11 +113,8 @@ export const fetchRepoPulls = async (repo, owner, accessToken) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    if (pullsResponse && pullsResponse.data && pullsResponse.data.length > 0) {
-      return pullsResponse.data.length;
-    } else {
-      return 0;
-    }
+
+    return separateUserFromCommitsAndPulls(pullsResponse.data);
   } catch (error) {
     console.error(`Error fetching pulls for ${repo}:`, error.message);
     return 0;
@@ -93,15 +129,8 @@ export const fetchRepoIssues = async (repo, owner, accessToken) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    if (
-      issuesResponse &&
-      issuesResponse.data &&
-      issuesResponse.data.length > 0
-    ) {
-      return issuesResponse.data.length;
-    } else {
-      return 0;
-    }
+
+    return separateUserFromCommitsAndPulls(issuesResponse.data);
   } catch (error) {
     console.error(`Error fetching issues for ${repo}:`, error.message);
     return 0;

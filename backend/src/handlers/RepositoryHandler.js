@@ -25,6 +25,12 @@ export const updateRepository = async (id, options) => {
   );
 }
 
+export const deleteRepositoryByIntegration = async (integrationId) => {
+  return Repository.deleteMany(
+    { integrationId },
+  );
+}
+
 
 export const deleteRepository = async (id) => {
   return Repository.deleteMany(
